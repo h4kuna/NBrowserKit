@@ -8,13 +8,10 @@ use Nette\Http\Request;
 use Nette\Http\UrlScript;
 use Symfony\Component\BrowserKit;
 
-
-
 class RequestConverter
 {
 
 	const FILE_KEYS = ['error', 'name', 'size', 'tmp_name', 'type'];
-
 
 
 	/**
@@ -30,40 +27,39 @@ class RequestConverter
 			$request->getCookies(),
 			self::getHeadersFromServerVariables($request->getServer()),
 			$request->getMethod(),
-			NULL,
-			NULL,
+			null,
+			null,
 			[$request, 'getContent']
 		);
 	}
 
 
-
 	/**
-	 * @param array[] $files
-	 * @return FileUpload[]
+	 * @param array<mixed> $files
+	 * @return array<mixed>
 	 */
 	private static function convertFiles(array $files)
 	{
 		$netteFiles = [];
 		foreach ($files as $key => $file) {
+			assert(is_array($file));
 			if (array_diff(array_keys($file), self::FILE_KEYS) === []) {
 				$netteFiles[$key] = new FileUpload($file);
 			} else {
 				$netteFiles[$key] = self::convertFiles($file);
 			}
-
 		}
 
 		return $netteFiles;
 	}
 
 
-
 	/**
-	 * @param array $serverVariables
-	 * @return array
+	 * @param array<string, string> $serverVariables
+	 * @return array<string, string>
 	 */
-	private static function getHeadersFromServerVariables(array $serverVariables) {
+	private static function getHeadersFromServerVariables(array $serverVariables)
+	{
 		$headers = [];
 		foreach ($serverVariables as $key => $value) {
 			if (substr($key, 0, 8) !== 'CONTENT_') {
@@ -74,6 +70,7 @@ class RequestConverter
 				$headers[$key] = $value;
 			}
 		}
+
 		return $headers;
 	}
 

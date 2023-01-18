@@ -2,8 +2,7 @@
 
 namespace NBrowserKit;
 
-
-class MissingContainerException extends \Exception
+final class MissingContainerException extends \Exception
 {
 
 }

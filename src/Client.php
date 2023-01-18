@@ -4,40 +4,30 @@ namespace NBrowserKit;
 
 use Nette\Application\Application;
 use Nette\Application\IPresenterFactory;
-use Nette\Application\IRouter;
+use Nette\Routing\Router;
 use Nette\DI\Container;
 use Nette\Http\IRequest;
 use Nette\Http\IResponse;
 use Symfony\Component\BrowserKit;
 
-
-
+/**
+ * @method BrowserKit\Response getResponse()
+ * @method IRequest getRequest()
+ */
 class Client extends BrowserKit\AbstractBrowser
 {
-
-	/**
-	 * @var Container
-	 */
-	private $container;
+	private ?Container $container = null;
 
 
-
-	/**
-	 * @param Container $container
-	 */
-	public function setContainer(Container $container)
+	public function setContainer(Container $container): void
 	{
 		$this->container = $container;
 	}
 
 
-
-	/**
-	 * @return Container
-	 */
-	protected function getContainer()
+	protected function getContainer(): Container
 	{
-		if ($this->container === NULL) {
+		if ($this->container === null) {
 			throw new MissingContainerException('Container is missing, use setContainer() method to set it.');
 		}
 
@@ -45,35 +35,11 @@ class Client extends BrowserKit\AbstractBrowser
 	}
 
 
-
 	/**
-	 * @return BrowserKit\Response
-	 */
-	public function getResponse()
-	{
-		return parent::getResponse();
-	}
-
-
-
-	/**
-	 * @return IRequest|NULL
-	 */
-	public function getRequest()
-	{
-		return parent::getRequest();
-	}
-
-
-
-	/**
-	 * Makes a request.
-	 *
 	 * @param IRequest $request
-	 * @return BrowserKit\Response
 	 * @throws MissingContainerException
 	 */
-	protected function doRequest($request)
+	protected function doRequest($request): BrowserKit\Response
 	{
 		$container = $this->getContainer();
 
@@ -86,8 +52,8 @@ class Client extends BrowserKit\AbstractBrowser
 
 		/** @var IPresenterFactory $presenterFactory */
 		$presenterFactory = $container->getByType(IPresenterFactory::class);
-		/** @var IRouter $router */
-		$router = $container->getByType(IRouter::class);
+		/** @var Router $router */
+		$router = $container->getByType(Router::class);
 		$application = $this->createApplication($request, $presenterFactory, $router, $response);
 		$container->removeService('application');
 		$container->addService('application', $application);
@@ -95,33 +61,34 @@ class Client extends BrowserKit\AbstractBrowser
 		ob_start();
 		$application->run();
 		$content = ob_get_clean();
+		assert($content !== false);
 
 		return new BrowserKit\Response($content, $response->getCode(), $response->getHeaders());
 	}
 
 
-
 	/**
 	 * Filters the BrowserKit request to the `Nette\Http` one.
-	 *
-	 * @param BrowserKit\Request $request
-	 * @return IRequest
 	 */
-	protected function filterRequest(BrowserKit\Request $request)
+	protected function filterRequest(BrowserKit\Request $request): IRequest
 	{
 		return RequestConverter::convertRequest($request);
 	}
 
-	protected function createApplication(IRequest $request, IPresenterFactory $presenterFactory, IRouter $router, IResponse $response)
+
+	protected function createApplication(
+		IRequest $request,
+		IPresenterFactory $presenterFactory,
+		Router $router,
+		IResponse $response,
+	): Application
 	{
-		$application = new Application(
+		return new Application(
 			$presenterFactory,
 			$router,
 			$request,
 			$response
 		);
-
-		return $application;
 	}
 
 }

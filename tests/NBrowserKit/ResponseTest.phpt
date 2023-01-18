@@ -1,19 +1,17 @@
-<?php
-/**
- * @testcase
- */
+<?php declare(strict_types=1);
 
-namespace Test\NBrowserKit;
+namespace NBrowserKit\Test;
 
 require_once __DIR__ . '/../bootstrap.php';
 
 use NBrowserKit\Response;
+use NBrowserKit\TestCase;
 use Nette\Http\IResponse;
 use Tester\Assert;
-use Tester\TestCase;
 
-
-
+/**
+ * @testCase
+ */
 class ResponseTest extends TestCase
 {
 
@@ -24,16 +22,14 @@ class ResponseTest extends TestCase
 	}
 
 
-
 	public function testAddHeader(): void
 	{
 		$response = new Response;
 		$response->addHeader('foo', 'bar');
 		Assert::same(['foo' => 'bar'], $response->getHeaders());
 		Assert::same('bar', $response->getHeader('foo'));
-		Assert::same(NULL, $response->getHeader('horseshit'));
+		Assert::same(null, $response->getHeader('horseshit'));
 	}
-
 
 
 	public function testRemoveHeader(): void
@@ -42,10 +38,9 @@ class ResponseTest extends TestCase
 		$response->addHeader('foo', 'bar');
 		$response->addHeader('hello', 'world');
 
-		$response->setHeader('foo', NULL);
+		$response->setHeader('foo', null);
 		Assert::same(['hello' => 'world'], $response->getHeaders());
 	}
-
 
 
 	public function testSetHeader(): void
@@ -58,7 +53,6 @@ class ResponseTest extends TestCase
 	}
 
 
-
 	public function testDefaultResponseCodeIs200(): void
 	{
 		http_response_code(418);
@@ -69,7 +63,5 @@ class ResponseTest extends TestCase
 	}
 
 }
-
-
 
 (new ResponseTest)->run();

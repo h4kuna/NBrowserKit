@@ -1,25 +1,23 @@
-<?php
-/**
- * @testcase
- */
+<?php declare(strict_types=1);
 
-namespace Test\NBrowserKit;
+namespace NBrowserKit\Test;
 
 require_once __DIR__ . '/../bootstrap.php';
 
 use Mockery\MockInterface;
 use NBrowserKit\Client;
+use NBrowserKit\TestCase;
 use Nette\Application\Application;
-use Nette\Application\IRouter;
+use Nette\Routing\Router;
 use Nette\Application\IPresenterFactory;
 use Nette\DI\Container;
 use Nette\Http\IRequest;
 use Nette\Http\IResponse;
 use Tester\Assert;
-use Tester\TestCase;
 
-
-
+/**
+ * @testCase
+ */
 class ClientTest extends TestCase
 {
 
@@ -44,7 +42,6 @@ class ClientTest extends TestCase
 	}
 
 
-
 	/**
 	 * @throws \NBrowserKit\MissingContainerException
 	 */
@@ -55,12 +52,10 @@ class ClientTest extends TestCase
 	}
 
 
-
 	protected function tearDown()
 	{
 		\Mockery::close();
 	}
-
 
 
 	/**
@@ -96,9 +91,9 @@ class ClientTest extends TestCase
 			->andReturn(\Mockery::mock(IPresenterFactory::class));
 		$container
 			->shouldReceive('getByType')
-			->with(IRouter::class)
+			->with(Router::class)
 			->once()
-			->andReturn(\Mockery::mock(IRouter::class));
+			->andReturn(\Mockery::mock(Router::class));
 		$container
 			->shouldReceive('removeService')
 			->with('application')
@@ -112,7 +107,5 @@ class ClientTest extends TestCase
 	}
 
 }
-
-
 
 (new ClientTest)->run();

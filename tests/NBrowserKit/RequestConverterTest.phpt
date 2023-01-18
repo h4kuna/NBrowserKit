@@ -1,22 +1,23 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * @testcase
  */
 
-namespace Test\NBrowserKit;
+namespace NBrowserKit\Test;
 
 require_once __DIR__ . '/../bootstrap.php';
 
 use NBrowserKit\RequestConverter;
+use NBrowserKit\TestCase;
 use Nette\Http\FileUpload;
 use Nette\Http\IRequest;
 use Nette\Http\UrlScript;
 use Symfony\Component\BrowserKit;
 use Tester\Assert;
-use Tester\TestCase;
 
-
-
+/**
+ * @testCase
+ */
 class RequestConverterTest extends TestCase
 {
 
@@ -27,7 +28,6 @@ class RequestConverterTest extends TestCase
 
 		Assert::type(IRequest::class, $output);
 	}
-
 
 
 	public function testConvertsUrl(): void
@@ -41,7 +41,6 @@ class RequestConverterTest extends TestCase
 	}
 
 
-
 	public function testConvertsQueryString(): void
 	{
 		$input = new BrowserKit\Request('http://example.com/?e=mc^2', 'GET');
@@ -49,7 +48,6 @@ class RequestConverterTest extends TestCase
 
 		Assert::same(['e' => 'mc^2'], $output->getQuery());
 	}
-
 
 
 	public function testConvertsMethod(): void
@@ -61,7 +59,6 @@ class RequestConverterTest extends TestCase
 	}
 
 
-
 	public function testConvertsBodyParameters(): void
 	{
 		$input = new BrowserKit\Request('http://example.com/', 'POST', ['foo' => 'bar']);
@@ -69,7 +66,6 @@ class RequestConverterTest extends TestCase
 
 		Assert::same(['foo' => 'bar'], $output->getPost());
 	}
-
 
 
 	public function testConvertsFiles(): void
@@ -111,7 +107,6 @@ class RequestConverterTest extends TestCase
 	}
 
 
-
 	public function testConvertsFilesMultiple(): void
 	{
 		$files = [
@@ -136,13 +131,12 @@ class RequestConverterTest extends TestCase
 		$output = RequestConverter::convertRequest($input);
 
 		Assert::count(1, $output->getFiles());
-		$fooFiles = $output->getFile('foo');
+		$fooFiles = $output->getFiles()['foo'];
 		Assert::type('array', $fooFiles);
 		Assert::count(2, $fooFiles);
-		Assert::type(FileUpload::class, $fooFiles[0]);
-		Assert::type(FileUpload::class, $fooFiles[1]);
+		Assert::type(FileUpload::class, $output->getFile(['foo', 0]));
+		Assert::type(FileUpload::class, $output->getFile(['foo', 1]));
 	}
-
 
 
 	public function testConvertsCookies(): void
@@ -152,7 +146,6 @@ class RequestConverterTest extends TestCase
 
 		Assert::same(['PHPSESSID' => 'bflmpsvz'], $output->getCookies());
 	}
-
 
 
 	public function testConvertsHeaders(): void
@@ -175,7 +168,6 @@ class RequestConverterTest extends TestCase
 	}
 
 
-
 	public function testConvertsContent(): void
 	{
 		$input = new BrowserKit\Request('http://example.com/', 'POST', [], [], [], [], 'Guten Tag');
@@ -185,7 +177,5 @@ class RequestConverterTest extends TestCase
 	}
 
 }
-
-
 
 (new RequestConverterTest)->run();

@@ -2,15 +2,13 @@
 
 namespace NBrowserKit;
 
-
 final class Response extends NetteResponseProxy
 {
 
 	/**
-	 * @var array
+	 * @var array<string, string>
 	 */
-	private $headers = [];
-
+	private array $headers = [];
 
 
 	public function __construct()
@@ -19,10 +17,9 @@ final class Response extends NetteResponseProxy
 	}
 
 
-
-	public function setHeader(string $name, ?string $value): self
+	public function setHeader(string $name, ?string $value): static
 	{
-		if ($value === NULL) {
+		if ($value === null) {
 			unset($this->headers[$name]);
 		} else {
 			$this->headers[$name] = $value;
@@ -32,8 +29,7 @@ final class Response extends NetteResponseProxy
 	}
 
 
-
-	public function addHeader(string $name, string $value): self
+	public function addHeader(string $name, string $value): static
 	{
 		$this->headers[$name] = $value;
 
@@ -41,13 +37,12 @@ final class Response extends NetteResponseProxy
 	}
 
 
-	public function deleteHeader(string $name): self
+	public function deleteHeader(string $name): static
 	{
 		unset($this->headers[$name]);
 
 		return $this;
 	}
-
 
 
 	public function getHeader(string $header): ?string
@@ -56,7 +51,9 @@ final class Response extends NetteResponseProxy
 	}
 
 
-
+	/**
+	 * @return array<string, string>
+	 */
 	public function getHeaders(): array
 	{
 		return $this->headers;
